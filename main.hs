@@ -3,7 +3,6 @@ module Main where
 import System.IO (hFlush, stdout)
 import Text.Read (readMaybe)
 import ToDoListManager
-import ToDoListManager (addTask)
 
 prompt :: String -> IO String
 prompt text = do
