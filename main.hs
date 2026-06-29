@@ -37,9 +37,14 @@ mainLoop currentTaskList = do
             idStr <- prompt "Enter the ID of the task you want to delete : "
             case readInt idStr of
                 Just targetTaskId -> do
-                    let updatedList = deleteTask targetTaskId currentTaskList
-                    putStrLn "Task successfully deleted!"
-                    mainLoop updatedList
+                    if null currentTaskList 
+                        then do
+                            putStrLn "No tasks have been added yet!"
+                            mainLoop currentTaskList
+                        else do
+                            let updatedList = deleteTask targetTaskId currentTaskList
+                            putStrLn "Task successfully deleted!"
+                            mainLoop updatedList
                 Nothing -> do
                     putStrLn "Invalid ID!"
                     mainLoop currentTaskList
@@ -59,4 +64,3 @@ main :: IO ()
 main = mainLoop emptyTaskList
 
         
-
