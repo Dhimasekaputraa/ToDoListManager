@@ -3,6 +3,7 @@ module Main where
 import System.IO (hFlush, stdout)
 import Text.Read (readMaybe)
 import ToDoListManager
+    ( addTask, deleteTask, emptyTaskList, showTask, ToDoListManager )
 
 prompt :: String -> IO String
 prompt text = do
@@ -36,9 +37,18 @@ mainLoop currentTaskList = do
             idStr <- prompt "Enter the ID of the task you want to delete : "
             case readInt idStr of
                 Just targetTaskId -> do
-                    let updatedList = deleteTask targetTaskId currentTaskList
-                    putStrLn "Task successfully deleted!"
-                    mainLoop updatedList
+                    if null currentTaskList 
+                        then do
+                            putStrLn "No tasks have been added yet!"
+                            mainLoop currentTaskList
+                        else do
+                           case deleteTask targetTaskId currentTaskList of
+                            Just updatedList -> do
+                                putStrLn "Task successfully deleted!"
+                                mainLoop updatedList
+                            Nothing -> do
+                                putStrLn "Task not available!"
+                                mainLoop currentTaskList
                 Nothing -> do
                     putStrLn "Invalid ID!"
                     mainLoop currentTaskList
