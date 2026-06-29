@@ -26,9 +26,11 @@ addTask desc currentTaskList =
         newTask = Task {taskId = nextId, taskDesc = desc, isTaskCompleted = False}
     in currentTaskList ++ [newTask]
 
-deleteTask :: Int -> ToDoListManager -> ToDoListManager
+deleteTask :: Int -> ToDoListManager -> Maybe ToDoListManager
 deleteTask targetTaskId currentTaskList =
-    filter (\t -> taskId t /= targetTaskId) currentTaskList
+    if any (\t -> taskId t == targetTaskId) currentTaskList
+        then Just (filter (\t -> taskId t /= targetTaskId) currentTaskList)
+        else Nothing
 
 showTask :: ToDoListManager -> String
 showTask [] = "Belum ada tugas yang ditambahkan"
