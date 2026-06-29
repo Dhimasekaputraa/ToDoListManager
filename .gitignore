@@ -1,0 +1,18 @@
+# Build directory
+build/
+
+# Executable
+todo
+main
+*.exe
+
+# GHC intermediate files
+*.o
+*.hi
+
+# GHCi files
+*.ghci
+*.hie
+
+# Haskell Language Server
+.haskell-language-server/
