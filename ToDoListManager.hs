@@ -2,8 +2,10 @@ module ToDoListManager (
     Task(..),
     ToDoListManager,
     emptyTaskList,
+    taskExist,
     addTask,
     deleteTask,
+    editTask,
     showTask
 ) where
 
@@ -20,6 +22,10 @@ type ToDoListManager = [Task]
 emptyTaskList :: ToDoListManager
 emptyTaskList = []
 
+taskExist :: Int -> ToDoListManager -> Bool
+taskExist targetTaskId currentTaskList =
+    any (\t -> taskId t == targetTaskId) currentTaskList
+
 addTask :: String -> ToDoListManager -> ToDoListManager
 addTask desc currentTaskList =
     let nextId = if null currentTaskList then 1 else maximum (map taskId currentTaskList) + 1
@@ -28,12 +34,12 @@ addTask desc currentTaskList =
 
 deleteTask :: Int -> ToDoListManager -> Maybe ToDoListManager
 deleteTask targetTaskId currentTaskList =
-    if any (\t -> taskId t == targetTaskId) currentTaskList
+    if taskExist targetTaskId currentTaskList
         then Just (filter (\t -> taskId t /= targetTaskId) currentTaskList)
         else Nothing
 
 showTask :: ToDoListManager -> String
-showTask [] = "Belum ada tugas yang ditambahkan"
+showTask [] = "No tasks have been added yet!"
 showTask list = 
     let tableHeader = "-----------------------------------\nID  | Description | Status\n-----------------------------------"
         renderStatus t = if isTaskCompleted t then "Finished" else "Not Finished Yet"
@@ -41,3 +47,12 @@ showTask list =
         rows = map renderRow list
         tableFooter = "-----------------------------------"
     in intercalate "\n" (tableHeader : rows ++ [tableFooter])
+
+editTask :: Int -> String -> ToDoListManager -> ToDoListManager
+editTask targetTaskId newDesc =
+        map edit
+    where
+        edit t
+            | taskId t == targetTaskId =
+                t {taskDesc = newDesc}
+            | otherwise = t
