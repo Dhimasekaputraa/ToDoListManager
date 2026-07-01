@@ -3,7 +3,8 @@ module Main where
 import System.IO (hFlush, stdout)
 import Text.Read (readMaybe)
 import ToDoListManager
-    ( addTask, deleteTask, editTask, emptyTaskList, taskExist, showTask, ToDoListManager )
+    ( addTask, deleteTask, editTask, emptyTaskList, isTaskExist, markFinished, taskFinished, showTask, ToDoListManager )
+import Data.Char (toLower)
 
 prompt :: String -> IO String
 prompt text = do
@@ -20,8 +21,9 @@ mainLoop currentTaskList = do
     putStrLn "1. Add Task"
     putStrLn "2. Delete Task"
     putStrLn "3. Edit Task"
-    putStrLn "4. Show Task List" 
-    putStrLn "5. Exit"
+    putStrLn "4. Mark Task as Finished"
+    putStrLn "5. Show Task List" 
+    putStrLn "6. Exit"
 
     option <- prompt "Choose menu : "
     case option of
@@ -65,7 +67,7 @@ mainLoop currentTaskList = do
 
                     case readInt idStr of
                         Just targetTaskId ->
-                            if not (taskExist targetTaskId currentTaskList)
+                            if not (isTaskExist targetTaskId currentTaskList)
                                 then do
                                     putStrLn "Task not available!"
                                     mainLoop currentTaskList
@@ -84,12 +86,52 @@ mainLoop currentTaskList = do
                             putStrLn "Invalid ID!"
                             mainLoop currentTaskList
         
+        
         "4" -> do
+            if null currentTaskList
+                then do
+                    putStrLn "No Task have been added yet!"
+                    mainLoop currentTaskList
+                else do
+                    idStr <- prompt "Enter the ID of the task you want to mark as finished: "
+
+                    case readInt idStr of
+                        Just targetTaskId ->
+                            if not (isTaskExist targetTaskId currentTaskList)
+                                then do
+                                    putStrLn "Task not Available"
+                                    mainLoop currentTaskList
+                                else do
+                                    if taskFinished targetTaskId currentTaskList
+                                        then do
+                                            putStrLn "Task already mark as finished!"
+                                            mainLoop currentTaskList
+                                        else do
+                                            confirmFinished  <- prompt "Mark the task as finished? [y/n] : "
+
+                                            case map toLower confirmFinished of
+                                                "y" -> do
+                                                    let updatedList = markFinished targetTaskId currentTaskList
+                                                    putStrLn "Task successfully mark as finished!"
+                                                    mainLoop updatedList
+                                                
+                                                "n" -> do
+                                                    putStrLn "Operation cancelled"
+                                                    mainLoop currentTaskList
+                                                
+                                                _ -> do
+                                                    putStrLn "Please enter y or n"
+                                                    mainLoop currentTaskList
+                        Nothing -> do
+                            putStrLn "Invalid ID!"
+                            mainLoop currentTaskList
+                                                    
+        "5" -> do
             putStrLn "Task List"
             putStrLn (showTask currentTaskList)
             mainLoop currentTaskList
 
-        "5" -> putStrLn "See you!"
+        "6" -> putStrLn "See you!"
 
         _ -> do
             putStrLn "Invalid option!"
@@ -97,6 +139,3 @@ mainLoop currentTaskList = do
 
 main :: IO ()
 main = mainLoop emptyTaskList
-
-        
-
