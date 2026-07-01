@@ -2,10 +2,12 @@ module ToDoListManager (
     Task(..),
     ToDoListManager,
     emptyTaskList,
-    taskExist,
+    isTaskExist,
     addTask,
     deleteTask,
     editTask,
+    markFinished,
+    taskFinished,
     showTask
 ) where
 
@@ -22,9 +24,13 @@ type ToDoListManager = [Task]
 emptyTaskList :: ToDoListManager
 emptyTaskList = []
 
-taskExist :: Int -> ToDoListManager -> Bool
-taskExist targetTaskId currentTaskList =
+isTaskExist :: Int -> ToDoListManager -> Bool
+isTaskExist targetTaskId currentTaskList =
     any (\t -> taskId t == targetTaskId) currentTaskList
+
+taskFinished :: Int -> ToDoListManager -> Bool
+taskFinished targetTaskId currentTaskList =
+    any (\t -> taskId t == targetTaskId && isTaskCompleted t) currentTaskList
 
 addTask :: String -> ToDoListManager -> ToDoListManager
 addTask desc currentTaskList =
@@ -34,7 +40,7 @@ addTask desc currentTaskList =
 
 deleteTask :: Int -> ToDoListManager -> Maybe ToDoListManager
 deleteTask targetTaskId currentTaskList =
-    if taskExist targetTaskId currentTaskList
+    if isTaskExist targetTaskId currentTaskList
         then Just (filter (\t -> taskId t /= targetTaskId) currentTaskList)
         else Nothing
 
@@ -55,4 +61,13 @@ editTask targetTaskId newDesc =
         edit t
             | taskId t == targetTaskId =
                 t {taskDesc = newDesc}
+            | otherwise = t
+
+markFinished :: Int -> ToDoListManager -> ToDoListManager
+markFinished targetTaskId = 
+        map mark
+    where
+        mark t
+            | taskId t == targetTaskId =
+                t {isTaskCompleted = True}
             | otherwise = t
